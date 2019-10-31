@@ -37,62 +37,52 @@ def measure():
     SOC=dec_to_float32(response.registers[0], response.registers[1])
     temp['D_SOC'] = SOC
     
-    #Measure Pac_Grid
-    response = client.read_input_registers(5053,2,unit=1)
-    Pac_Grid=dec_to_float32(response.registers[0], response.registers[1])
-    temp['E_Pac_Grid'] = Pac_Grid
-    
-    #Measure Batt Vdc
-    response = client.read_input_registers(5005,2,unit=1)
-    Vdc=dec_to_float32(response.registers[0], response.registers[1])
-    temp['F_Vdc'] = Vdc
-    
     #Yokogawa Power Analyzer
     meter.write(':NUMeric:HOLD ON')
     meter.write(':NUMeric:NORMal:ITEM1 P,1;ITEM P,2;')
     
     #Measure Pac
     Pac = float(meter.query(':NUMERIC:NORMAL:VALUE? 3'))
-    temp['G_Pac'] = Pac
+    temp['E_Pac'] = Pac
     
     #Measure Batt Pdc
     Pdc = float(meter.query(':NUMERIC:NORMAL:VALUE? 6'))
-    temp['H_Pdc'] = Pdc
+    temp['F_Pdc'] = Pdc
     
-    #Measure Q1
+    #Measure Q15_P2
     daq.write('MEAS:TEMP? %s,%s,(%s)' % ('TCouple', 'K', '@101'))
     time.sleep(0.5)
-    temp['I_Q1'] = float(daq.read())
+    temp['G_Q15_P2'] = float(daq.read())
     
-    #Measure Q2
+    #Measure Q16_P2
     daq.write('MEAS:TEMP? %s,%s,(%s)' % ('TCouple', 'K', '@301'))
     time.sleep(0.5)
-    temp['J_Q2'] = float(daq.read())
+    temp['H_Q16_P2'] = float(daq.read())
     
-    #Measure Q3
-    #daq.write('MEAS:TEMP? %s,%s,(%s)' % ('TCouple', 'K', '@102'))
-    #time.sleep(0.5)
-    #temp['K_Q3'] = float(daq.read())
+    #Measure Q2_P1
+    daq.write('MEAS:TEMP? %s,%s,(%s)' % ('TCouple', 'K', '@102'))
+    time.sleep(0.5)
+    temp['I_Q2_P1'] = float(daq.read())
     
-    #Measure Q4
+    #Measure Q1_P1
     daq.write('MEAS:TEMP? %s,%s,(%s)' % ('TCouple', 'K', '@303'))
     time.sleep(0.5)
-    temp['L_Q4'] = float(daq.read())
+    temp['J_Q1_P1'] = float(daq.read())
     
-    #Measure Q1 Htsk 
+    #Measure Q15_P2 Htsk 
     daq.write('MEAS:TEMP? %s,%s,(%s)' % ('TCouple', 'K', '@304'))
     time.sleep(0.5)
-    temp['M_Q1_Htsk'] = float(daq.read())
+    temp['K_Q1_Htsk'] = float(daq.read())
     
     #Measure Ext Amo
     daq.write('MEAS:TEMP? %s,%s,(%s)' % ('TCouple', 'K', '@305'))
     time.sleep(0.5)
-    temp['N_Ext_Amb'] = float(daq.read())
+    temp['L_Ext_Amb'] = float(daq.read())
        
     #Measure Internal Temp
     response = client.read_input_registers(5093,2,unit=1)
     Int_Temp=dec_to_float32(response.registers[0], response.registers[1])
-    temp['O_Int_Temp'] = Int_Temp
+    temp['M_Int_Temp'] = Int_Temp
 
     
 results = pd.DataFrame()
