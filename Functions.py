@@ -44,10 +44,7 @@ def measure(temp, meter):
     
     #Yokogawa Power Analyzer
     meter.write(':NUMeric:HOLD ON')
-    meter.write(':NUMeric:NORMal:ITEM1 URMS,1;ITEM2 IRMS,1;ITEM3 P,1;ITEM4 UDC,2;ITEM5 IDC,2;ITEM6 P,2;ITEM7 ITHD,1;')
-    #temp['B_Vmeter']=(meter.query(':NUMERIC:NORMAL:VALUE? 1'))
-    #temp['C_Imeter']=(meter.query(':NUMERIC:NORMAL:VALUE? 2'))
-    #temp['D_Pmeter']=(meter.query(':NUMERIC:NORMAL:VALUE? 3'))
+    meter.write(':NUMeric:NORMal:ITEM1 URMS,1;ITEM2 IRMS,1;ITEM3 LAMBda,1;ITEM4 P,1;ITEM5 UDC,2;ITEM6 IDC,2;ITEM7 P,2;ITEM8 ITHD,1;')
     
     #Measure Vac
     Vac = float(meter.query(':NUMERIC:NORMAL:VALUE? 1'))
@@ -57,30 +54,34 @@ def measure(temp, meter):
     Iac = float(meter.query(':NUMERIC:NORMAL:VALUE? 2'))
     temp['D_Iac'] = Iac
     
+    #Measure P_Factor
+    PF = float(meter.query(':NUMERIC:NORMAL:VALUE? 3'))
+    temp['E_PF'] = PF    
+    
     #Measure Pac
-    Pac = float(meter.query(':NUMERIC:NORMAL:VALUE? 3'))
-    temp['E_Pac'] = Pac
+    Pac = float(meter.query(':NUMERIC:NORMAL:VALUE? 4'))
+    temp['F_Pac'] = Pac
     
     #Measure Batt Vdc
-    Vdc = float(meter.query(':NUMERIC:NORMAL:VALUE? 4'))
-    temp['F_Vdc'] = Vdc
+    Vdc = float(meter.query(':NUMERIC:NORMAL:VALUE? 5'))
+    temp['G_Vdc'] = Vdc
    
     #Measure Batt Idc
-    Idc = float(meter.query(':NUMERIC:NORMAL:VALUE? 5'))
-    temp['G_Idc'] = Idc
+    Idc = float(meter.query(':NUMERIC:NORMAL:VALUE? 6'))
+    temp['H_Idc'] = Idc
     
     #Measure Batt Pdc
-    Pdc = float(meter.query(':NUMERIC:NORMAL:VALUE? 6'))
-    temp['H_Pdc'] = Pdc
+    Pdc = float(meter.query(':NUMERIC:NORMAL:VALUE? 7'))
+    temp['I_Pdc'] = Pdc
     
     #Measure Eff
-    if Pdc > Pac:
-        temp['I_Eff'] = Pac/Pdc
+    if abs(Pdc) > abs(Pac):
+        temp['J_Eff'] = (Pac*100)/Pdc
     else:
-        temp['I_Eff'] = Pdc/Pac
+        temp['J_Eff'] = (Pdc*100)/Pac
     
     #Measure ITHD
-    Ithd = float(meter.query(':NUMERIC:NORMAL:VALUE? 7'))
-    temp['J_Ithd'] = Ithd
+    Ithd = float(meter.query(':NUMERIC:NORMAL:VALUE? 8'))
+    temp['K_Ithd'] = Ithd
     
     meter.write(':NUMeric:HOLD OFF')            
