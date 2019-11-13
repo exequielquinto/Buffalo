@@ -1,7 +1,7 @@
 import pandas as pd         
 import visa, time    
 from pymodbus.client.sync import ModbusSerialClient as ModbusClient
-from Functions import float32_to_msb, float32_to_lsb, pac_set, measure
+from Functions import float32_to_msb, float32_to_lsb, pac_set, measure, harmonics
 import numpy as np
 
 #Connect to Instruments
@@ -14,15 +14,10 @@ connection = client.connect()
 #print(connection)
 
 #For load sequence
-#bi_time=300  #5minsBurn In time in seconds
-#capture_time=120   # 2mins //time in seconds for each successive eff capture
-#load=(3000,2700,2400,2100,2000,1800,1500,1200,1000,900,600,300,0,-3000,-2700,-2400,-2100,-2000,-1800,-1500,-1200,-1000,-900,-600,-300,0)
-
-#For load sequence
-bi_time=300  #5minsBurn In time in seconds
+bi_time=120  #5minsBurn In time in seconds
 #bi_time=900   #For Aux separated test, fans always full blast
 capture_time=120   # 2mins //time in seconds for each successive eff capture
-load=(3000,2700,2400,2100,1800,1500,1200,900,600,300,0,-3000,-2700,-2400,-2100,-1800,-1500,-1200,-900,-600,-300,0)
+load=(3000,2000,1000,-3000,-2000,-1000)
     
 steps=np.arange(0,len(load))
 print steps
@@ -49,18 +44,18 @@ for step in steps:
     
     print('measure')
     try:
-        measure(temp, meter)
+        harmonics(temp, meter)
     except:
         try:
             print('measure error1')
-            measure(temp, meter)
+            harmonics(temp, meter)
         except:
             print('measure error2')
-            measure(temp, meter)
+            harmonics(temp, meter)
     
     results = results.append(temp, ignore_index=True)    # 17
-    print temp['A_Time'],' ',temp['F_Pac'],'Watts',' ',temp['I_Pdc'],'Watts', temp['J_Eff'],'%',' ',temp['K_Ithd'],'%'
-    results.to_csv('Unit_Efficiency_No_fan_Rem.csv')
+    #print temp['A_Time'],' ',temp['F_Pac'],'Watts',' ',temp['I_Pdc'],'Watts', temp['J_Eff'],'%',' ',temp['K_Ithd'],'%'
+    results.to_csv('Harmonics_Unit2_3FEt.csv')
 
 pac_set(float32_to_msb(0),float32_to_lsb(0),client)               
 print('finished')

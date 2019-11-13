@@ -44,7 +44,7 @@ def measure(temp, meter):
     
     #Yokogawa Power Analyzer
     meter.write(':NUMeric:HOLD ON')
-    meter.write(':NUMeric:NORMal:ITEM1 URMS,1;ITEM2 IRMS,1;ITEM3 LAMBda,1;ITEM4 P,1;ITEM5 UDC,2;ITEM6 IDC,2;ITEM7 P,2;ITEM8 ITHD,1;')
+    meter.write(':NUMeric:NORMal:ITEM1 URMS,1;ITEM2 IRMS,1;ITEM3 LAMBda,1;ITEM4 P,1;ITEM5 UDC,2;ITEM6 IDC,2;ITEM7 P,2;ITEM8 ITHD,1;ITEM9 UDC,3;ITEM10 IDC,3;ITEM11 P,3;')
     
     #Measure Vac
     Vac = float(meter.query(':NUMERIC:NORMAL:VALUE? 1'))
@@ -84,4 +84,40 @@ def measure(temp, meter):
     Ithd = float(meter.query(':NUMERIC:NORMAL:VALUE? 8'))
     temp['K_Ithd'] = Ithd
     
-    meter.write(':NUMeric:HOLD OFF')            
+    #Measure Vaux
+    Vaux = float(meter.query(':NUMERIC:NORMAL:VALUE? 9'))
+    temp['L_Vaux'] = Vaux
+   
+    #Measure Iaux
+    Iaux = float(meter.query(':NUMERIC:NORMAL:VALUE? 10'))
+    temp['M_Iaux'] = Iaux
+    
+    #Measure Paux
+    Paux = float(meter.query(':NUMERIC:NORMAL:VALUE? 11'))
+    temp['N_Paux'] = Paux
+    
+    meter.write(':NUMeric:HOLD OFF')   
+    
+def harmonics(temp, meter):
+    #Time
+    temp['A_Time']=time.ctime()
+    
+    #Minutes
+    temp['B_Mins']=round((time.time()-ref_time)/60)
+    
+    #Yokogawa Power Analyzer
+    #Measure Harmonics
+    meter.write(':NUMeric:HOLD ON')
+    meter.write(':HARMONICS:PLLSOURCE I1')   #works
+    meter.write(':NUMeric:LIST:NUMber 1')
+    meter.write(':NUMERIC:LIST:ORDER 40')   #works
+    #meter.write(':NUMERIC:ORDER 1,40')
+    meter.write(':NUMERIC:LIST:SELECT ALL')  #works
+    #meter.write(':NUMERIC:LIST:VALUE? 1')
+    temp['C_Harmonics'] = (meter.query(':NUMERIC:LIST:VALUE?'))
+    
+    #Measure ITHD
+    meter.write(':NUMeric:NORMal:ITEM1 ITHD,1;')
+    temp['D_ITHD'] = float(meter.query(':NUMERIC:NORMAL:VALUE? 1'))
+   
+    meter.write(':NUMeric:HOLD OFF')         
