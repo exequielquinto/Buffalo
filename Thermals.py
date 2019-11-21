@@ -27,8 +27,6 @@ def measure():
     
     #Measure PD
     response = client.read_input_registers(5003,2,unit=1)
-    #print response.registers[0]
-    #print response.registers[1]
     PD=int(response.registers[1])
     temp['C_PD'] = PD
     
@@ -51,12 +49,12 @@ def measure():
     
     #Measure Q15_P2
     daq.write('MEAS:TEMP? %s,%s,(%s)' % ('TCouple', 'K', '@101'))
-    time.sleep(0.3)
+    time.sleep(0.5)
     temp['G_Q15_P2'] = float(daq.read())
     
     #Measure Q16_P2
     daq.write('MEAS:TEMP? %s,%s,(%s)' % ('TCouple', 'K', '@102'))
-    time.sleep(0.3)
+    time.sleep(0.5)
     temp['H_Q16_P2'] = float(daq.read())
     
     #Measure Q2_P1
@@ -70,13 +68,13 @@ def measure():
     #temp['J_Q1_P1'] = float(daq.read())
     
     #Measure Q15_P2 Htsk 
-    daq.write('MEAS:TEMP? %s,%s,(%s)' % ('TCouple', 'K', '@103'))
-    time.sleep(0.3)
-    temp['K_Q1_Htsk'] = float(daq.read())
+    #daq.write('MEAS:TEMP? %s,%s,(%s)' % ('TCouple', 'K', '@103'))
+    #time.sleep(0.3)
+    #temp['K_Q1_Htsk'] = float(daq.read())
     
     #Measure Ext Amo
     daq.write('MEAS:TEMP? %s,%s,(%s)' % ('TCouple', 'K', '@104'))
-    time.sleep(0.3)
+    time.sleep(0.5)
     temp['L_Ext_Amb'] = float(daq.read())
        
     #Measure Internal Temp
@@ -97,26 +95,36 @@ temp['C_PD']=0
 while temp['C_PD'] !=1:
     
     #measure()
-    try:
-        measure()       
-    except:
+    #try:
+    #    measure()       
+    #except:
+    #   try:
+    #        print('measure error1')
+    #        time.sleep(1)
+    #        measure()
+    #    except:
+    #        try:
+    #            print('measure error2')
+    #            time.sleep(1)
+    #            measure()
+    #        except:
+    #            print('measure error3')
+    #            time.sleep(1)
+    #            measure()
+                
+    measured = False
+    while not measured:
         try:
-            print('measure error1')
-            time.sleep(1)
+            print('measure')
             measure()
+            measured = True
         except:
-            try:
-                print('measure error2')
-                time.sleep(1)
-                measure()
-            except:
-                print('measure error3')
-                time.sleep(1)
-                measure()
+           pass 
     
     results = results.append(temp, ignore_index=True)    # 17
     #print temp['A_Time'],' ',temp['E_Pac_Grid'],'Watts',' ',temp['C_PD'],' ',temp['D_SOC'],'%',' ',temp['I_Choke_Backplate_Temp'],'C',' ',temp['J_Choke_Core_Temp'],'C',' ',temp['K_Choke_Top_Temp'],'C',' ',temp['L_Trf_Pri_Temp'],'C',' ',temp['M_Trf_Sec_Temp'],'C'
-    print temp['A_Time'],' ',temp['E_Pac'],'W',' ',temp['F_Pdc'],'W',temp['C_PD'],' ',temp['D_SOC'],'%',' ',temp['G_Q15_P2'],'C',' ',temp['H_Q16_P2'],'C',' ',temp['K_Q1_Htsk'],'C',temp['L_Ext_Amb'],'C',temp['M_Int_Temp'],'C',temp['N_U5_P2'],'C'
+    #print temp['A_Time'],' ',temp['E_Pac'],'W',' ',temp['F_Pdc'],'W',temp['C_PD'],' ',temp['D_SOC'],'%',' ',temp['G_Q15_P2'],'C',' ',temp['H_Q16_P2'],'C',' ',temp['K_Q1_Htsk'],'C',temp['L_Ext_Amb'],'C',temp['M_Int_Temp'],'C',temp['N_U5_P2'],'C'
+    print temp['A_Time'],' ',temp['E_Pac'],'W',' ',temp['F_Pdc'],'W',temp['C_PD'],' ',temp['D_SOC'],'%',' ',temp['G_Q15_P2'],'C',' ',temp['H_Q16_P2'],'C',' ',temp['L_Ext_Amb'],'C',temp['M_Int_Temp'],'C'
     results.to_csv('Thermals_3FET_F035N10A.csv')
     time.sleep(60)   # Delay in seconds before capturing results               
 print('finished')

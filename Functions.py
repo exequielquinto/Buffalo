@@ -1,4 +1,5 @@
 import struct, time
+from pymodbus import client
 
 def float32_to_bin(num):
     return bin(struct.unpack('!I', struct.pack('!f', num))[0])[2:].zfill(32)
@@ -35,7 +36,7 @@ def pac_set(msb,lsb,client):
             client.write_register(5055, lsb)
  
 ref_time=time.time()
-def measure(temp, meter):
+def measure(temp, meter, client):
     #Time
     temp['A_Time']=time.ctime()
     
@@ -96,6 +97,11 @@ def measure(temp, meter):
     Paux = float(meter.query(':NUMERIC:NORMAL:VALUE? 11'))
     temp['N_Paux'] = Paux
     
+    #Measure Int Temp
+    response = client.read_input_registers(5093,2,unit=1)
+    Int_Temp=dec_to_float32(response.registers[0], response.registers[1])
+    temp['O_Int_Temp'] = Int_Temp
+    
     meter.write(':NUMeric:HOLD OFF')   
     
 def harmonics(temp, meter):
@@ -114,10 +120,10 @@ def harmonics(temp, meter):
     #meter.write(':NUMERIC:ORDER 1,40')
     meter.write(':NUMERIC:LIST:SELECT ALL')  #works
     #meter.write(':NUMERIC:LIST:VALUE? 1')
-    temp['C_Harmonics'] = (meter.query(':NUMERIC:LIST:VALUE?'))
+    temp['D_Harmonics'] = (meter.query(':NUMERIC:LIST:VALUE?'))
     
     #Measure ITHD
     meter.write(':NUMeric:NORMal:ITEM1 ITHD,1;')
-    temp['D_ITHD'] = float(meter.query(':NUMERIC:NORMAL:VALUE? 1'))
+    temp['C_ITHD'] = float(meter.query(':NUMERIC:NORMAL:VALUE? 1'))
    
     meter.write(':NUMeric:HOLD OFF')         
