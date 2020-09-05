@@ -34,6 +34,17 @@ def pac_set(msb,lsb,client):
             print('pac set error2')
             client.write_register(5054, msb)
             client.write_register(5055, lsb)
+            
+def Active_Sleep(value,client):
+    try:
+        client.write_register(5063, value)
+    except:
+        try:
+            print('pac set error1')
+            client.write_register(5063, value)
+        except:
+            print('pac set error2')
+            client.write_register(5063, value)
  
 ref_time=time.time()
 def measure(temp, meter, client):
@@ -108,19 +119,22 @@ def harmonics(temp, meter):
     #Time
     temp['A_Time']=time.ctime()
     
-    #Minutes
-    temp['B_Mins']=round((time.time()-ref_time)/60)
+    #Minutes/Sec
+    #temp['B_Mins']=round((time.time()-ref_time)/60)
+    temp['B_Sec']=((time.time()-ref_time)/1)
     
     #Yokogawa Power Analyzer
     #Measure Harmonics
     meter.write(':NUMeric:HOLD ON')
-    meter.write(':HARMONICS:PLLSOURCE I1')   #works
+    #meter.write(':HARMONICS:PLLSOURCE V1')   #works
     meter.write(':NUMeric:LIST:NUMber 1')
     meter.write(':NUMERIC:LIST:ORDER 40')   #works
     #meter.write(':NUMERIC:ORDER 1,40')
     meter.write(':NUMERIC:LIST:SELECT ALL')  #works
     #meter.write(':NUMERIC:LIST:VALUE? 1')
     temp['D_Harmonics'] = (meter.query(':NUMERIC:LIST:VALUE?'))
+    #print temp['D_Harmonics']
+    #print (meter.query(':HARMonics:ORDer'))
     
     #Measure ITHD
     meter.write(':NUMeric:NORMal:ITEM1 ITHD,1;')
